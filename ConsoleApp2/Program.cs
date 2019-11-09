@@ -42,7 +42,7 @@ namespace ConsoleApp2
             }
             catch (MySqlException ex)
             {
-                switch(ex.Number)
+                switch (ex.Number)
                 {
                     case 0:
                         Console.WriteLine("Cannot connect");
@@ -69,7 +69,7 @@ namespace ConsoleApp2
 
             }
         }
-       
+
     }
     class login
     {
@@ -112,18 +112,18 @@ namespace ConsoleApp2
                 MySqlDataReader reader = login.ExecuteReader();
                 try
                 {
-                    while(reader.Read())
+                    while (reader.Read())
                     {
                         Console.WriteLine(string.Format("{0},{1}", reader["ID"], reader["Type_ID"]));
                         if (reader["Type_ID"] == 1)
                         {
                             Student stuobject = new Student(reader["ID"]);
                         }
-                        else if(reader["Type_ID"]==3)
+                        else if (reader["Type_ID"] == 3)
                         {
                             Teacher teachobject = new Teacher(reader["ID"]);
                         }
-                        else if(reader["Type_ID"]==4)
+                        else if (reader["Type_ID"] == 4)
                         {
                             Staff staffobject = new Staff(reader["ID"]);
                         }
@@ -132,7 +132,7 @@ namespace ConsoleApp2
                             Console.WriteLine("Invalid Username/Password!");
                         }
 
-                        
+
 
                     }
                 }
@@ -144,11 +144,11 @@ namespace ConsoleApp2
 
             }
 
-            
-            
+
+
         }
 
-        
+
     }
     class Student
     {
@@ -168,9 +168,39 @@ namespace ConsoleApp2
     {
         public Staff(int ID)
         {
+            Console.WriteLine("0 to insert/update/delete batches, 1. Allot slots, 2. Allot Batches");
+            int choice = Convert.ToInt32(Console.ReadLine());
+            if (choice == 0)
+                new AddUsers();
+            else if (choice == 1)
+                new AddSlots();
+            else if (choice == 2)
+                new AllotBatches();
 
         }
     }
+    class AddUsers
+    {
+        public AddUsers()
+        {
+            Console.WriteLine("1.Insert/Update 2. Delete");
+            String checkforID = "select userExists(?)";
+
+
+
+
+        }
+    }
+    class AddSlots
+    {
+
+    }
+    class AllotBatches
+    {
+
+    }
+      
+
     class Program
     {
         static void Main(string[] args)
