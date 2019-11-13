@@ -8,7 +8,7 @@ using MySql.Data.MySqlClient;
 
 namespace ConsoleApp2
 {
-    class sqlConnector
+    public class sqlConnector
     {
         public MySqlConnection connection;
         private string server;
@@ -20,7 +20,7 @@ namespace ConsoleApp2
             Initialize();
         }
 
-        public void Initialize()
+        public MySqlConnection Initialize()
         {
             server = "localhost";
             database = "dbmsproject";
@@ -30,6 +30,7 @@ namespace ConsoleApp2
             connectionString = "SERVER=" + server + ";" + "DATABASE=" +
             database + ";" + "UID=" + uid + ";" + "PASSWORD=" + password + ";";
             connection = new MySqlConnection(connectionString);
+            return connection;
         }
         public bool OpenConnection()
         {
@@ -115,17 +116,22 @@ namespace ConsoleApp2
                     while (reader.Read())
                     {
                         Console.WriteLine(string.Format("{0},{1}", reader["ID"], reader["Type_ID"]));
-                        if (reader["Type_ID"] == 1)
+                        int type = Int32.Parse(reader["Type_ID"].ToString());
+                        int temp_ID = Int32.Parse(reader["ID"].ToString());
+                        if (type == 1)
                         {
-                            Student stuobject = new Student(reader["ID"]);
+                            Console.WriteLine("Student");
+                            Student stuobject = new Student(temp_ID,connection);
                         }
-                        else if (reader["Type_ID"] == 3)
+                        else if (type == 3)
                         {
-                            Teacher teachobject = new Teacher(reader["ID"]);
+                            Console.WriteLine("Teacher");
+                            Teacher teachobject = new Teacher(temp_ID,connection);
                         }
-                        else if (reader["Type_ID"] == 4)
+                        else if (type == 4)
                         {
-                            Staff staffobject = new Staff(reader["ID"]);
+                            Console.WriteLine("Staff");
+                            Staff staffobject = new Staff(temp_ID,connection);
                         }
                         else
                         {
@@ -152,39 +158,41 @@ namespace ConsoleApp2
     }
     class Student
     {
-        public Student(int ID)
+        public Student(int ID,MySqlConnection connection)
         {
 
         }
     }
     class Teacher
     {
-        public Teacher(int ID)
+        public Teacher(int ID, MySqlConnection connection)
         {
 
         }
     }
     class Staff
     {
-        public Staff(int ID)
+        public Staff(int ID, MySqlConnection connection)
         {
             Console.WriteLine("0 to insert/update/delete batches, 1. Allot slots, 2. Allot Batches");
             int choice = Convert.ToInt32(Console.ReadLine());
             if (choice == 0)
-                new AddUsers();
+                new AddUsers(connection);
             else if (choice == 1)
-                new AddSlots();
+                new AddSlots(connection);
             else if (choice == 2)
-                new AllotBatches();
+                new AllotBatches(connection);
 
         }
     }
     class AddUsers
     {
-        public AddUsers()
+        public AddUsers(MySqlConnection connection)
         {
             Console.WriteLine("1.Insert/Update 2. Delete");
             String checkforID = "select userExists(?)";
+                        
+
 
 
 
@@ -193,11 +201,17 @@ namespace ConsoleApp2
     }
     class AddSlots
     {
+        public AddSlots(MySqlConnection connection)
+        {
 
+        }
     }
     class AllotBatches
     {
+        public AllotBatches(MySqlConnection connection)
+        {
 
+        }
     }
       
 
