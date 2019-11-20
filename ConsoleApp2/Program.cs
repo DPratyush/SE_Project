@@ -77,6 +77,7 @@ namespace ConsoleApp2
         string Username;
         string password;
         MySqlConnection connection;
+        string connectionString;
         public login()
         {
             String UN, pword;
@@ -90,7 +91,6 @@ namespace ConsoleApp2
             String database = "dbmsproject";
             String uid = "root";
             String passwordServer = "mysql";
-            string connectionString;
             connectionString = "SERVER=" + server + ";" + "DATABASE=" +
             database + ";" + "UID=" + uid + ";" + "PASSWORD=" + passwordServer + ";";
             connection = new MySqlConnection(connectionString);
@@ -113,39 +113,46 @@ namespace ConsoleApp2
                 MySqlDataReader reader = login.ExecuteReader();
                 try
                 {
-                    while (reader.Read())
+                    if (reader.HasRows)
                     {
+                        reader.Read();
                         Console.WriteLine(string.Format("{0},{1}", reader["ID"], reader["Type_ID"]));
                         int type = Int32.Parse(reader["Type_ID"].ToString());
                         int temp_ID = Int32.Parse(reader["ID"].ToString());
                         if (type == 1)
                         {
                             Console.WriteLine("Student");
-                            Student stuobject = new Student(temp_ID,connection);
+                            reader.Close();
+                            Student stuobject = new Student(temp_ID, connection);
                         }
                         else if (type == 3)
                         {
                             Console.WriteLine("Teacher");
-                            Teacher teachobject = new Teacher(temp_ID,connection);
+                            reader.Close();
+                            Teacher teachobject = new Teacher(temp_ID, connection);
                         }
                         else if (type == 4)
                         {
                             Console.WriteLine("Staff");
-                            Staff staffobject = new Staff(temp_ID,connection);
+                            reader.Close();
+                            Staff staffobject = new Staff(temp_ID, connection);
+
                         }
-                        else
-                        {
-                            Console.WriteLine("Invalid Username/Password!");
-                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("Invalid Username/Password!");
+                    }
 
 
 
                     }
-                }
                 finally
                 {
                     reader.Close();
                 }
+            }
+                
 
 
             }
@@ -155,7 +162,7 @@ namespace ConsoleApp2
         }
 
 
-    }
+    
     class Student
     {
         public Student(int ID,MySqlConnection connection)
@@ -187,17 +194,73 @@ namespace ConsoleApp2
     }
     class AddUsers
     {
+        int Usr_ID;
+        string password;
+        string FirstName;
+        string LastName;
+        int EnrollmentNumber;
+        int phone;
+        string email;
+        string Address;
+        string type;
+        DateTime DOB;
+        DateTime EnrollmentDate;
         public AddUsers(MySqlConnection connection)
         {
             Console.WriteLine("1.Insert/Update 2. Delete");
-            String checkforID = "select userExists(?)";
-                        
+            int choice = Convert.ToInt32(Console.ReadLine());
+            if (choice == 1)
+            {
+                string checkforID = "userExists";
+                Console.WriteLine("Enter username to check.");
+                string newUser = Console.ReadLine();
+                MySqlCommand userChecker = new MySqlCommand(checkforID,connection);
+                userChecker.CommandType = System.Data.CommandType.StoredProcedure;
+                userChecker.Parameters.Add(new MySqlParameter("exists",MySqlDbType.Int32));
+                userChecker.Parameters["exists"].Direction = System.Data.ParameterDirection.ReturnValue;
+                userChecker.Parameters.Add(new MySqlParameter("user", MySqlDbType.String));
+                userChecker.Parameters["user"].Direction = System.Data.ParameterDirection.Input;
+                userChecker.Parameters["user"].Value = newUser;
+                userChecker.ExecuteScalar();
+                Console.WriteLine(userChecker.Parameters["exists"].Value.ToString());
+               /* MySqlDataReader reader= userChecker.ExecuteReader();
+                
+                    Usr_ID = setUserFields(newUser,connection);
+                    String typeChecker = "select typeOfUser(@username)";
+                    MySqlCommand checkerType = new MySqlCommand(typeChecker, connection);
+                    checkerType.Parameters.AddWithValue("@username", newUser);
+                    MySqlDataReader typeReader = checkerType.ExecuteReader();
+                    while(typeReader.Read())
+                    {
+                        type=typeReader[""]
+                    }*/
+
+                
+                
+
+            }
+            
+
 
 
 
 
 
         }
+        public int setUserFields(String username, MySqlConnection connection)
+        {
+            String UserFieldsSetter = "Select ID,password from user where username=@username";
+            MySqlCommand SetUserFields = new MySqlCommand(UserFieldsSetter, connection);
+            SetUserFields.Parameters.AddWithValue("@username", username);
+            MySqlDataReader reader = SetUserFields.ExecuteReader();
+            int User_ID=-1;
+            while(reader.Read())
+            {
+                User_ID = Int32.Parse(reader["ID"].ToString());
+                password = reader["Password"].ToString();
+            }
+            return User_ID;
+        }   
     }
     class AddSlots
     {
